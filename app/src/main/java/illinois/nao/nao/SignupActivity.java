@@ -27,6 +27,7 @@ import com.google.firebase.storage.StorageReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import illinois.nao.nao.Model.Utils;
 import illinois.nao.nao.Pages.ProfileFragment;
 import illinois.nao.nao.Storage.StorageHelper;
 import illinois.nao.nao.User.User;
@@ -49,8 +50,6 @@ public class SignupActivity extends AppCompatActivity {
     @BindView(R.id.editText_username) EditText userName;
     @BindView(R.id.editText_name) EditText displayName;
 
-    public static boolean calledAlready = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +59,9 @@ public class SignupActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
 
-        if(!calledAlready) {
+        if(!Utils.calledAlready) {
             mDatabase.setPersistenceEnabled(true);
-            calledAlready = true;
+            Utils.calledAlready = true;
         }
 
         mUsersRef = mDatabase.getReference("users");
