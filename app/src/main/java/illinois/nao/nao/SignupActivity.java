@@ -49,6 +49,8 @@ public class SignupActivity extends AppCompatActivity {
     @BindView(R.id.editText_username) EditText userName;
     @BindView(R.id.editText_name) EditText displayName;
 
+    public static boolean calledAlready = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +59,12 @@ public class SignupActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
-        mDatabase.setPersistenceEnabled(true);
+
+        if(!calledAlready) {
+            mDatabase.setPersistenceEnabled(true);
+            calledAlready = true;
+        }
+
         mUsersRef = mDatabase.getReference("users");
         mStorage = FirebaseStorage.getInstance();
         mStorageRef = mStorage.getReferenceFromUrl("gs://nao-app-bc1b6.appspot.com");
