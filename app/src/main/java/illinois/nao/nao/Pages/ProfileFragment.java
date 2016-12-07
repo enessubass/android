@@ -403,7 +403,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         // Ensure that there's a camera activity to handle the intent
                         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
-                            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                            startActivityForResult(takePictureIntent, CHANGE_PROFILE);
                         }
                     } else if (i == 1) {
                         Intent intent = new Intent();
