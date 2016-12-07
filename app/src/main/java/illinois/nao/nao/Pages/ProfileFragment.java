@@ -237,15 +237,21 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                     // Local temp file has been created
+                    if(mp != null) {
+                        mp.release();
+                    }
 
                     mp = MediaPlayer.create(getContext(), Uri.fromFile(audioFile));
 
-                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mediaPlayer) {
-                            buttonAudio.setImageResource(R.drawable.ic_play_arrow_black_24dp);
-                        }
-                    });
+                    if(mp != null) {
+                        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                buttonAudio.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                            }
+                        });
+                    }
+
                     Log.d(TAG, "media player created");
                 }
             }).addOnFailureListener(new OnFailureListener() {
