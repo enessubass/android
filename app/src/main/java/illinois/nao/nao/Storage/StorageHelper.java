@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -35,13 +36,12 @@ public class StorageHelper {
 
     public static void uploadFile(Uri file, StorageReference userVideoRef, OnFailureListener fail, OnSuccessListener success) {
         UploadTask uploadTask = userVideoRef.putFile(file);
-        if(fail != null) {
+        if (fail != null) {
             uploadTask.addOnFailureListener(fail);
         }
-        if(success != null) {
+        if (success != null) {
             uploadTask.addOnSuccessListener(success);
         }
-
     }
 
     public static void populateImage(final StorageReference imageReference, final ImageView imageView) {
@@ -51,18 +51,11 @@ public class StorageHelper {
             @Override
             public void onSuccess(StorageMetadata storageMetadata) {
                 String md5 = storageMetadata.getMd5Hash();
-                if (imageView.getId() != R.id.profile_pic && imageView.getId() != R.id.imageView && imageView.getId() != R.id.newsfeed_image) {
+                if (imageView.getId() != R.id.profile_pic && imageView.getId() != R.id.imageView) {
                     Glide.with(imageView.getContext()).using(new FirebaseImageLoader())
                             .load(imageReference).signature(new StringSignature(md5))
                             .diskCacheStrategy(DiskCacheStrategy.SOURCE).into(imageView);
                 } else {
-                    if(imageView.getId() == R.id.newsfeed_image) {
-                        Glide.with(imageView.getContext()).using(new FirebaseImageLoader())
-                                .load(imageReference).signature(new StringSignature(md5))
-                                .diskCacheStrategy(DiskCacheStrategy.SOURCE).centerCrop()
-                                .override(50, 50).into(imageView);
-                        return;
-                    }
                     Glide.with(imageView.getContext()).using(new FirebaseImageLoader())
                             .load(imageReference).signature(new StringSignature(md5))
                             .diskCacheStrategy(DiskCacheStrategy.SOURCE).centerCrop()

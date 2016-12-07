@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
@@ -64,14 +65,22 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private static final int PICK_VIDEO_FILE = 1004;
     private static final int CHANGE_PROFILE = 1005;
 
-    @BindView(R.id.profile_videoplayer) EMVideoView videoPlayer;
-    @BindView(R.id.profile_button_audio) ImageButton buttonAudio;
-    @BindView(R.id.scrollView_profile) NestedScrollView scrollView;
-    @BindView(R.id.textView_textContent) TextView textContent;
-    @BindView(R.id.textView_name) TextView name;
-    @BindView(R.id.imageView2) ImageView imageContent;
-    @BindView(R.id.imageView) ImageView profilePicture;
-    @BindView(R.id.floatingActionMenu) FloatingActionMenu floatingActionMenu;
+    @BindView(R.id.profile_videoplayer)
+    EMVideoView videoPlayer;
+    @BindView(R.id.profile_button_audio)
+    ImageButton buttonAudio;
+    @BindView(R.id.scrollView_profile)
+    NestedScrollView scrollView;
+    @BindView(R.id.textView_textContent)
+    TextView textContent;
+    @BindView(R.id.textView_name)
+    TextView name;
+    @BindView(R.id.imageView2)
+    ImageView imageContent;
+    @BindView(R.id.imageView)
+    ImageView profilePicture;
+    @BindView(R.id.floatingActionMenu)
+    FloatingActionMenu floatingActionMenu;
 
     private MediaPlayer mp;
     private FirebaseUser mUser;
@@ -99,7 +108,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mUsersRef = mDatabase.getReference("users");
         mUserRef = mUsersRef.child(userName);
         mStorage = FirebaseStorage.getInstance();
-        mStorageRef  = mStorage.getReferenceFromUrl("gs://nao-app-bc1b6.appspot.com");
+        mStorageRef = mStorage.getReferenceFromUrl("gs://nao-app-bc1b6.appspot.com");
         mAllUserStorageRef = mStorageRef.child("users");
         mUserStorageRef = mStorageRef.child("users").child(userName);
 
@@ -125,7 +134,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         FloatingActionButton photo = (FloatingActionButton) view.findViewById(R.id.add_photo);
         FloatingActionButton video = (FloatingActionButton) view.findViewById(R.id.record_video);
-        FloatingActionButton text  = (FloatingActionButton) view.findViewById(R.id.write_post);
+        FloatingActionButton text = (FloatingActionButton) view.findViewById(R.id.write_post);
         FloatingActionButton audio = (FloatingActionButton) view.findViewById(R.id.record_audio);
         photo.setOnClickListener(this);
         video.setOnClickListener(this);
@@ -145,7 +154,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             public void onClick(View v) {
                 Log.i("Media Player", "Is Playing: " + mp.isPlaying());
 
-                if(mp.isPlaying()) {
+                if (mp.isPlaying()) {
                     mp.pause();
                     //mp.stop();
                     Log.i("Media Player", "Pause");
@@ -237,13 +246,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                     // Local temp file has been created
-                    if(mp != null) {
+                    if (mp != null) {
                         mp.release();
                     }
 
                     mp = MediaPlayer.create(getContext(), Uri.fromFile(audioFile));
 
-                    if(mp != null) {
+                    if (mp != null) {
                         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -278,11 +287,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     /**
      * This method takes a file as a Uri and uploads it to the storage reference /username/video/file
+     *
      * @param file Uri file
      */
     public void uploadVideo(Uri file) {
         StorageReference userVideoRef = mUserStorageRef.child("video");
-        StorageHelper.uploadFile(file, userVideoRef,null, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        StorageHelper.uploadFile(file, userVideoRef, null, new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 populateVideo();
@@ -292,19 +302,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     public void uploadImage(Uri file) {
-        StorageReference userPhotoRef = mUserStorageRef.child("image");
-        StorageHelper.uploadFile(file, userPhotoRef, null, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                populateImage();
-            }
-        });
-        StorageHelper.pushToFeed(mUser.getDisplayName(), PostEvent.Type.IMAGE);
+        try {
+            StorageReference userPhotoRef = mUserStorageRef.child("image");
+            StorageHelper.uploadFile(file, userPhotoRef, null, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    populateImage();
+                }
+            });
+            StorageHelper.pushToFeed(mUser.getDisplayName(), PostEvent.Type.IMAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Something went wrong. Sorry.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void uploadSound(Uri file) {
         StorageReference userSoundRef = mUserStorageRef.child("sound");
-        StorageHelper.uploadFile(file, userSoundRef,null, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        StorageHelper.uploadFile(file, userSoundRef, null, new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 populateAudio();
@@ -313,7 +328,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         StorageHelper.pushToFeed(mUser.getDisplayName(), PostEvent.Type.AUDIO);
     }
 
-    public void changeProfile(Uri file){
+    public void changeProfile(Uri file) {
         StorageReference userProfileRef = mUserStorageRef.child("profile");
         StorageHelper.uploadFile(file, userProfileRef, null, new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -328,28 +343,28 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         final int button = view.getId();
         System.out.println(button);
         CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
-        if(button == R.id.record_video){
+        if (button == R.id.record_video) {
             options[0] = "Record Video";
         }
-        if(button == R.id.add_photo || button == R.id.record_video){
+        if (button == R.id.add_photo || button == R.id.record_video) {
             final CharSequence[] choices = options;
             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(view.getContext());
             builder.setTitle("Add Photo");
             builder.setItems(choices, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    if(i == 0 && button == R.id.add_photo){
+                    if (i == 0 && button == R.id.add_photo) {
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         // Ensure that there's a camera activity to handle the intent
                         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
                             startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                         }
-                    }else if(i == 0){
+                    } else if (i == 0) {
                         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
                         if (takeVideoIntent.resolveActivity(getContext().getPackageManager()) != null) {
                             startActivityForResult(takeVideoIntent, REQUEST_RECORD_VIDEO);
                         }
-                    }else if(i == 1){
+                    } else if (i == 1) {
                         Intent intent = new Intent();
                         if (button == R.id.add_photo) {
                             intent.setType("image/*");
@@ -362,22 +377,22 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         }
 
                         System.out.println("Pick from Gallery");
-                    }else if(i == 2){
+                    } else if (i == 2) {
                         dialogInterface.dismiss();
                     }
                 }
             });
             builder.show();
-        }else if(button == R.id.record_audio){
+        } else if (button == R.id.record_audio) {
             System.out.println("record");
             AudioDialog dialog = new AudioDialog(view.getContext(), mUserStorageRef, mUser.getDisplayName());
             dialog.setContentView(R.layout.audio_dialog);
             dialog.setTitle("Record Audio");
             dialog.show();
-        }else if(button == R.id.write_post){
+        } else if (button == R.id.write_post) {
             PostDialog dialog = new PostDialog(view.getContext(), mUser.getDisplayName());
             dialog.show();
-        }else if(button == R.id.imageView){
+        } else if (button == R.id.imageView) {
             final CharSequence[] choices = options;
             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(view.getContext());
             builder.setTitle("Add Photo");
@@ -390,12 +405,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
                             startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                         }
-                    } else if(i==1){
+                    } else if (i == 1) {
                         Intent intent = new Intent();
                         intent.setType("image/*");
                         intent.setAction(Intent.ACTION_GET_CONTENT);
                         startActivityForResult(Intent.createChooser(intent, "Select Profile Picture"), CHANGE_PROFILE);
-                    }else{
+                    } else {
                         dialogInterface.dismiss();
                     }
                 }
@@ -408,7 +423,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_TAKE_PHOTO:
                 if (resultCode == RESULT_OK) {
                     uploadImage(data.getData());
@@ -430,7 +445,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     uploadVideo(data.getData());
                 }
             case CHANGE_PROFILE:
-                if (resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     changeProfile(data.getData());
                 }
             default:
@@ -441,13 +456,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mp != null) {
+        if (mp != null) {
             mp.release();
         }
-        if(videoFile != null) {
+        if (videoFile != null) {
             Log.d(TAG, "Video file deleted: " + videoFile.delete());
         }
-        if(audioFile != null) {
+        if (audioFile != null) {
             Log.d(TAG, "Audio file deleted: " + audioFile.delete());
         }
     }
