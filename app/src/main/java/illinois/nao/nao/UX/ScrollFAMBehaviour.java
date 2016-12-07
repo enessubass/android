@@ -32,7 +32,7 @@ public class ScrollFAMBehaviour extends CoordinatorLayout.Behavior<FloatingActio
     @Override
     public void onNestedScroll(CoordinatorLayout coordinatorLayout, FloatingActionMenu child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
-
+        child.close(true);
         if (dyConsumed > 0 && !this.isAnimatingOut && child.getVisibility() == View.VISIBLE) {
             this.animateOut(child);
         } else if (dyConsumed < 0 && child.getVisibility() != View.VISIBLE) {
