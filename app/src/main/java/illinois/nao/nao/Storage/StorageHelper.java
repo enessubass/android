@@ -56,6 +56,12 @@ public class StorageHelper {
                             .load(imageReference).signature(new StringSignature(md5))
                             .diskCacheStrategy(DiskCacheStrategy.SOURCE).into(imageView);
                 } else {
+                    if(imageView.getId() == R.id.newsfeed_image) {
+                        Glide.with(imageView.getContext()).using(new FirebaseImageLoader())
+                                .load(imageReference).signature(new StringSignature(md5))
+                                .diskCacheStrategy(DiskCacheStrategy.SOURCE).centerCrop()
+                                .override(200,200).into(imageView);
+                    }
                     Glide.with(imageView.getContext()).using(new FirebaseImageLoader())
                             .load(imageReference).signature(new StringSignature(md5))
                             .diskCacheStrategy(DiskCacheStrategy.SOURCE).centerCrop()
