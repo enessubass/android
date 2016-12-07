@@ -282,6 +282,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void uploadText(String text) {
         DatabaseReference textRef = mUsersRef.child(userName);
         textRef.setValue(text);
+        textContent.setText(text);
         StorageHelper.pushToFeed(mUser.getDisplayName(), PostEvent.Type.TEXT);
     }
 
@@ -392,6 +393,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         } else if (button == R.id.write_post) {
             PostDialog dialog = new PostDialog(view.getContext(), mUser.getDisplayName());
             dialog.show();
+            dialog.setOnFinish(new PostDialog.OnFinish() {
+                @Override
+                public void onFinish() {
+                    populateText();
+                }
+            });
         } else if (button == R.id.imageView) {
             final CharSequence[] choices = options;
             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(view.getContext());

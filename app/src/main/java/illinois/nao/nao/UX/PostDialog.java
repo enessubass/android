@@ -28,6 +28,15 @@ import illinois.nao.nao.User.PostEvent;
  */
 
 public class PostDialog extends Dialog implements View.OnClickListener {
+    private OnFinish onFinish;
+
+    public interface OnFinish {
+        public void onFinish();
+    }
+
+    public void setOnFinish(OnFinish onFinish) {
+        this.onFinish = onFinish;
+    }
 
     private EditText body;
     private String userName;
@@ -62,5 +71,13 @@ public class PostDialog extends Dialog implements View.OnClickListener {
         } else if (view.getId() == R.id.cancel_post) {
             dismiss();
         }
+    }
+
+    @Override
+    public void dismiss() {
+        if(onFinish != null) {
+            onFinish.onFinish();
+        }
+        super.dismiss();
     }
 }
